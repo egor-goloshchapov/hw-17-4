@@ -1,0 +1,12 @@
+{
+  "name": "hw-17-4",
+  "version": "1.0.0",
+  "description": "Homework",
+  "main": "main.js",
+  "scripts": {
+    "server": "json-server --watch students.json --port 3000"
+  },
+  "devDependencies": {
+    "json-server": "^1.0.0-beta.3"
+  }
+}
