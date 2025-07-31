@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/students';
+const url = 'http://localhost:3000/students';
 
 const getBtn = document.getElementById('get-students-btn');
 const tableBody = document.querySelector('#students-table tbody');
@@ -6,7 +6,7 @@ const form = document.getElementById('add-student-form');
 
 async function getStudents() {
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(url);
     const students = await res.json();
     renderStudents(students);
   } catch (error) {
@@ -49,20 +49,6 @@ form.addEventListener('submit', async function addStudent(e) {
     isEnrolled: document.getElementById('isEnrolled').checked
   };
 
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newStudent)
-    });
-
-    if (!res.ok) throw new Error('Помилка при додаванні студента');
-
-    form.reset();
-    getStudents();
-  } catch (error) {
-    console.error(error);
-  }
 });
 
 async function updateStudent(id) {
@@ -70,7 +56,7 @@ async function updateStudent(id) {
   if (!newName) return;
 
   try {
-    await fetch(`${API_URL}/${id}`, {
+    await fetch(`${url}/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newName })
@@ -85,7 +71,7 @@ async function deleteStudent(id) {
   if (!confirm('Ви впевнені, що хочете видалити цього студента?')) return;
 
   try {
-    await fetch(`${API_URL}/${id}`, {
+    await fetch(`${url}/${id}`, {
       method: 'DELETE'
     });
     getStudents();
