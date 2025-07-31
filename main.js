@@ -1,82 +1,87 @@
-const url = 'https://my-json-api.onrender.com/students';
+const url = "http://localhost:3000/students";
 
-const getBtn = document.getElementById('get-students-btn');
-const tableBody = document.querySelector('#students-table tbody');
-const form = document.getElementById('add-student-form');
+// Прив'язуємо обробники подій лише один раз після завантаження скрипта
+document.getElementById("get-students-btn").addEventListener("click", getStudents);
+document.getElementById("add-student-form").addEventListener("submit", addStudent);
 
-async function getStudents() {
-  try {
-    const res = await fetch(url);
-    const students = await res.json();
-    renderStudents(students);
-  } catch (error) {
-    console.error('Помилка отримання студентів:', error);
-  }
+function getStudents() {
+    fetch(url)
+        .then(res => res.json())
+        .then(data => renderStudents(data))
+        .catch(err => console.error("Помилка при отриманні студентів:", err));
+}
+
+function addStudent(e) {
+    e.preventDefault();
+
+    const student = {
+        name: document.getElementById("name").value,
+        age: Number(document.getElementById("age").value),
+        course: document.getElementById("course").value,
+        skills: document.getElementById("skills").value.split(",").map(s => s.trim()),
+        email: document.getElementById("email").value,
+        isEnrolled: document.getElementById("isEnrolled").checked
+    };
+
+    console.log("Student to send:", student);
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(student)
+    })
+        .then(res => {
+            console.log("Response status:", res.status);
+            if (!res.ok) throw new Error("Failed to save student");
+            return res.json();
+        })
+        .then(data => {
+            console.log("Student added:", data);
+            getStudents();
+            // Очистити форму після додавання
+            document.getElementById("add-student-form").reset();
+        })
+        .catch(err => {
+            console.error("Error:", err.message);
+        });
 }
 
 function renderStudents(students) {
-  tableBody.innerHTML = '';
-  students.forEach(student => {
-    const row = document.createElement('tr');
+    const tbody = document.querySelector("#students-table tbody");
+    tbody.innerHTML = "";
 
-    row.innerHTML = `
-      <td>${student.id}</td>
-      <td>${student.name}</td>
-      <td>${student.age}</td>
-      <td>${student.course}</td>
-      <td>${student.skills.join(', ')}</td>
-      <td>${student.email}</td>
-      <td>${student.isEnrolled ? 'Записаний' : 'Не записаний'}</td>
-      <td>
-        <button onclick="updateStudent(${student.id})">Оновити</button>
-        <button onclick="deleteStudent(${student.id})">Видалити</button>
-      </td>
-    `;
-
-    tableBody.appendChild(row);
-  });
-}
-
-form.addEventListener('submit', async function addStudent(e) {
-  e.preventDefault();
-
-  const newStudent = {
-    name: document.getElementById('name').value.trim(),
-    age: parseInt(document.getElementById('age').value),
-    course: document.getElementById('course').value.trim(),
-    skills: document.getElementById('skills').value.split(',').map(s => s.trim()),
-    email: document.getElementById('email').value.trim(),
-    isEnrolled: document.getElementById('isEnrolled').checked
-  };
-
-});
-
-async function updateStudent(id) {
-  const newName = prompt("Введіть нове ім'я для студента:");
-  if (!newName) return;
-
-  try {
-    await fetch(`${url}/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newName })
+    students.forEach(student => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${student.id}</td>
+          <td>${student.name}</td>
+          <td>${student.age}</td>
+          <td>${student.course}</td>
+          <td>${student.skills.join(", ")}</td>
+          <td>${student.email}</td>
+          <td>${student.isEnrolled ? "✅" : "❌"}</td>
+          <td>
+            <button onclick="updateStudent(${student.id})">Оновити</button>
+            <button onclick="deleteStudent(${student.id})">Видалити</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
     });
-    getStudents();
-  } catch (error) {
-    console.error('Помилка оновлення:', error);
-  }
 }
 
-async function deleteStudent(id) {
-  if (!confirm('Ви впевнені, що хочете видалити цього студента?')) return;
-
-  try {
-    await fetch(`${url}/${id}`, {
-      method: 'DELETE'
-    });
-    getStudents();
-  } catch (error) {
-    console.error('Помилка видалення:', error);
-  }
+function updateStudent(id) {
+    alert("Функція оновлення поки не реалізована");
 }
 
+function deleteStudent(id) {
+    if (!confirm("Видалити цього студента?")) return;
+
+    fetch(`${url}/${id}`, { method: "DELETE" })
+        .then(() => {
+            console.log("Студента видалено:", id);
+            getStudents();
+        })
+        .catch(err => console.error("Помилка при видаленні студента:", err));
+}
