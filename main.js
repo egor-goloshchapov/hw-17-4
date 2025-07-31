@@ -1,4 +1,4 @@
-const url = 'http://localhost:3000/students';
+const url = 'https://my-json-api.onrender.com/students';
 
 const getBtn = document.getElementById('get-students-btn');
 const tableBody = document.querySelector('#students-table tbody');
