@@ -1,18 +1,55 @@
-const STORAGE_KEY = "studentsData";
+const url = "http://localhost:3000/students";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnGet = document.getElementById("get-students-btn");
+  const formAdd = document.getElementById("add-student-form");
+
+  btnGet.addEventListener("click", getStudents);
+  formAdd.addEventListener("submit", addStudent);
+});
 
 function getStudents() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) return [];
-  return JSON.parse(data);
+  fetch(url)
+    .then(res => res.json())
+    .then(data => renderStudents(data))
+    .catch(err => console.error("Помилка при отриманні студентів:", err));
 }
 
-function saveStudents(students) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+function addStudent(e) {
+  e.preventDefault();
+
+  const student = {
+    name: document.getElementById("name").value,
+    age: Number(document.getElementById("age").value),
+    course: document.getElementById("course").value,
+    skills: document.getElementById("skills").value.split(",").map(s => s.trim()),
+    email: document.getElementById("email").value,
+    isEnrolled: document.getElementById("isEnrolled").checked
+  };
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(student)
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Не вдалось додати студента");
+      return res.json();
+    })
+    .then(data => {
+      console.log("Студент доданий:", data);
+      getStudents();
+      document.getElementById("add-student-form").reset();
+    })
+    .catch(err => console.error("Помилка:", err));
 }
 
 function renderStudents(students) {
   const tbody = document.querySelector("#students-table tbody");
   tbody.innerHTML = "";
+
   students.forEach(student => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -28,49 +65,3 @@ function renderStudents(students) {
         <button onclick="deleteStudent(${student.id})">Видалити</button>
       </td>
     `;
-    tbody.appendChild(tr);
-  });
-}
-
-function addStudent(e) {
-  e.preventDefault();
-
-  let students = getStudents();
-
-  let newId = students.length ? Math.max(...students.map(s => s.id)) + 1 : 1;
-
-  const student = {
-    id: newId,
-    name: document.getElementById("name").value,
-    age: Number(document.getElementById("age").value),
-    course: document.getElementById("course").value,
-    skills: document.getElementById("skills").value.split(",").map(s => s.trim()),
-    email: document.getElementById("email").value,
-    isEnrolled: document.getElementById("isEnrolled").checked
-  };
-
-  students.push(student);
-  saveStudents(students);
-  renderStudents(students);
-
-  e.target.reset();
-}
-
-function deleteStudent(id) {
-  if (!confirm("Видалити цього студента?")) return;
-
-  let students = getStudents();
-  students = students.filter(s => s.id !== id);
-  saveStudents(students);
-  renderStudents(students);
-}
-
-function updateStudent(id) {
-  alert(`Оновлення студента з ID ${id} поки не реалізовано.`);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  renderStudents(getStudents());
-});
-
-document.getElementById("add-student-form").addEventListener("submit", addStudent);
