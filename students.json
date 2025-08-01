@@ -96,6 +96,17 @@
       ],
       "email": "egorgoloshchapov84@gmail.com",
       "isEnrolled": true
+    },
+    {
+      "id": "7fbe",
+      "name": "3",
+      "age": 3,
+      "course": "3",
+      "skills": [
+        "3"
+      ],
+      "email": "egorgoloshchapov84@gmail.com",
+      "isEnrolled": true
     }
   ]
 }

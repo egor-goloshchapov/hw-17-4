@@ -1,6 +1,5 @@
 const url = "http://localhost:3000/students";
 
-// Завантаження студентів
 async function getStudents() {
   try {
     const res = await fetch(url);
@@ -12,7 +11,6 @@ async function getStudents() {
   }
 }
 
-// Додавання студента
 async function addStudent(e) {
   e.preventDefault();
 
@@ -44,7 +42,6 @@ async function addStudent(e) {
   }
 }
 
-// Видалення студента
 async function deleteStudent(id) {
   if (!confirm("Ви впевнені, що хочете видалити цього студента?")) return;
 
@@ -62,12 +59,10 @@ async function deleteStudent(id) {
   }
 }
 
-// Оновлення студента (можна реалізувати повністю при потребі)
 async function updateStudent(id) {
   alert("Оновлення ще не реалізовано, але тут буде async/await");
 }
 
-// Рендер студентів у таблицю
 function renderStudents(students) {
   const tbody = document.querySelector("#students-table tbody");
   tbody.innerHTML = "";
@@ -91,7 +86,6 @@ function renderStudents(students) {
   });
 }
 
-// Події DOM
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("get-students-btn").addEventListener("click", getStudents);
   document.getElementById("add-student-form").addEventListener("submit", addStudent);
